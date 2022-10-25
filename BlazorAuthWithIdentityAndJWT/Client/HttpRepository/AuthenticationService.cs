@@ -38,7 +38,7 @@ namespace BlazorAuthWithIdentityAndJWT.Client.HttpRepository
                 return result;
             }
 
-            return new RegistrationResponseDto { IsSuccessfulRegistration = true };
+            return new RegistrationResponseDto { IsSuccessfulRegistration = true};
         }
 
         public async Task<AuthResponseDto> Login(UserForAuthenticationDto userForAuthentication)
@@ -58,7 +58,7 @@ namespace BlazorAuthWithIdentityAndJWT.Client.HttpRepository
             ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(result.Token);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", result.Token);
 
-            return new AuthResponseDto { IsAuthSuccessful = true };
+            return result;
         }
 
         public async Task<AuthResponseDto> VerifyEmail(string id)

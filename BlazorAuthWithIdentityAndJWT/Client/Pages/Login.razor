@@ -8,6 +8,10 @@
 {
     <div class="alert alert-danger" role="alert">
         <p>@Error</p>
+        @if (EmailIsNotConfirmed)
+        {
+            <a href="VerifyEmail/@UserID"> click here to verify your email</a>
+        }
     </div>
 }
 
@@ -37,10 +41,12 @@
 </EditForm>
 
 @code {
-    private UserForAuthenticationDto _userForAuthentication = new();
-    public bool ShowAuthError { get; set; }
-    public string Error { get; set; }
-    public async Task ExecuteLogin()
+    UserForAuthenticationDto _userForAuthentication = new();
+    bool ShowAuthError { get; set; }
+    string Error { get; set; }
+    bool EmailIsNotConfirmed { get; set; } = false;
+    string UserID { get; set; }
+    async Task ExecuteLogin()
     {
         ShowAuthError = false;
         var result = await AuthenticationService.Login(_userForAuthentication);
@@ -49,13 +55,16 @@
             Error = result.ErrorMessage;
             ShowAuthError = true;
         }
+        else if (!result.VerifiedEmail)
+        {
+            Error = result.ErrorMessage;
+            EmailIsNotConfirmed = true;
+            UserID = result.UserID;
+            ShowAuthError = true;
+        }
         else
         {
-            if (result.VerifiedEmail)
-                NavigationManager.NavigateTo("/");
-            else
-                NavigationManager.NavigateTo("/VerifyEmail/" + LoggedUser.Id);
-
+            NavigationManager.NavigateTo("/");
         }
     }
 }

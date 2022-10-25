@@ -7,5 +7,6 @@
         public string Token { get; set; }
         public string RefreshToken { get; set; }
         public bool VerifiedEmail { get; set; }
+        public string UserID { get; set; }
     }
 }

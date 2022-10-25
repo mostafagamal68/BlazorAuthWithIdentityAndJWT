@@ -60,7 +60,9 @@ namespace BlazorAuthWithIdentityAndJWT.Server.Controllers
 
             if (user == null || !await _userManager.CheckPasswordAsync(user, userForAuthentication.Password))
                 return Unauthorized(new AuthResponseDto { ErrorMessage = "Invalid Authentication" });
-
+            if (!await _userManager.IsEmailConfirmedAsync(user))
+                return Unauthorized(new AuthResponseDto { IsAuthSuccessful = true, VerifiedEmail = false, ErrorMessage = "Email not confirmed" , UserID = user.Id });
+            
             var signingCredentials = _tokenService.GetSigningCredentials();
             var claims = await _tokenService.GetClaims(user);
             var tokenOptions = _tokenService.GenerateTokenOptions(signingCredentials, claims);
@@ -72,7 +74,7 @@ namespace BlazorAuthWithIdentityAndJWT.Server.Controllers
             await _userManager.UpdateAsync(user);
             _mapper.Map<LoggedUser>(user);
 
-            return Ok(new AuthResponseDto { IsAuthSuccessful = true, Token = token, RefreshToken = user.RefreshToken, VerifiedEmail = await _userManager.IsEmailConfirmedAsync(user) });
+            return Ok(new AuthResponseDto { IsAuthSuccessful = true, Token = token, RefreshToken = user.RefreshToken, VerifiedEmail = true });
         }
 
         [HttpPut("VerifyEmail")]
